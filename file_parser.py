@@ -56,13 +56,15 @@ def load_data(data_folder):
             for nctid,phase,stat,N,Nt in zip(nctids,phases,status,enroll,en_typ):
                 #print(phase,stat,N,Nt)
                 if float(phase) > max_phase: max_phase = float(phase)
+                try: N = int(N)
+                except: N = "NA"
                 supporting_studies.append(
                     {
                         "id": nctid,
                         "tested_intervention": "yes" if pred == "biolink:in_clinical_trials_for" else "unsure",
                         "phase": phase,
                         "status": stat,
-                        "study_size": int(N),
+                        "study_size": N,
                     }
                 )
             if pred == "biolink:in_clinical_trials_for" and max_phase >= 4:
@@ -131,6 +133,7 @@ def main():
     gen = load_data('test')
     while not testing or done < 10:
         #entry = next(gen)
+        #print(json.dumps(entry, sort_keys=True, indent=2))
         #continue
         try: entry = next(gen)
         except:
