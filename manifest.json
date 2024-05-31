@@ -11,7 +11,7 @@
             "https://storage.googleapis.com/multiomics_provider_kp_data/clinical_trials/clinical_trials_kg_edges_v2.1.tsv",
             "https://storage.googleapis.com/multiomics_provider_kp_data/clinical_trials/clinical_trials_kg_nodes_v2.1.tsv"
         ],
-        "uncompress": false
+        "uncompress": false,
         "release": "version:get_release"
     },
     "uploader" : {
