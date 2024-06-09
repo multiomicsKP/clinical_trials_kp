@@ -102,7 +102,7 @@ def load_data(data_folder):
             edge_attributes.append(
                 {
                     "attribute_type_id": "elevate_to_prediction",
-                     "value": elevate_to_prediction,
+                     "value": str(elevate_to_prediction),
                 }
             )
             
