@@ -6,6 +6,7 @@ attribute_source = "infores:biothings-multiomics-clinicaltrials"
 aact = "infores:aact"
 ctgov = "infores:clinicaltrials"
 kgInfoUrl = "https://db.systemsbiology.net/gestalt/cgi-pub/KGinfo.pl?id="
+treats = "biolink:treats"
 
 def load_data(data_folder):
     edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.1.tsv")
@@ -32,7 +33,7 @@ def load_data(data_folder):
                 "name": id_name_mapping[subj],
                 "type": id_type_mapping[subj]
             }
-            
+
             prefix = obj.split(':')[0].replace(".","_")
             object_ = {
                 "id": obj,
@@ -57,22 +58,22 @@ def load_data(data_folder):
                 #print(phase,stat,N,Nt)
                 if float(phase) > max_phase:
                     max_phase = float(phase)
-                
+
                 try: N = int(N)
-                except: N = "NA"
-                
+                except: N = -1
+
                 supporting_studies.append(
                     {
                         "id": nctid,
-                        "tested_intervention": "yes" if pred == "biolink:in_clinical_trials_for" else "unsure",
+                        "tested_intervention": "unsure" if pred == "biolink:mentioned_in_trials_for" else "yes",
                         "phase": phase,
                         "status": stat,
                         "study_size": N,
                     }
                 )
-                
-            if pred == "biolink:in_clinical_trials_for" and max_phase >= 4:
-                    elevate_to_prediction = True
+
+            #if pred == "biolink:in_clinical_trials_for" and max_phase >= 4:
+            #        elevate_to_prediction = True
 
             # knowledge level
             edge_attributes.append(
@@ -89,7 +90,7 @@ def load_data(data_folder):
                      "value": line['agent_type'],
                 }
             )
-            
+
             # max research phase
             edge_attributes.append(
                 {
@@ -97,7 +98,7 @@ def load_data(data_folder):
                      "value": str(max_phase),
                 }
             )
-            
+
             # elevate to prediction
             edge_attributes.append(
                 {
@@ -105,23 +106,42 @@ def load_data(data_folder):
                      "value": str(elevate_to_prediction),
                 }
             )
-            
+
             # sources
             edge_sources = [
                 {
-                    "resource_id": attribute_source,
-                    "resource_role": "aggregator_knowledge_source",
-                    "source_record_urls": [ kgInfoUrl + line['id'] ]
-                },
-                {
                     "resource_id": aact,
                     "resource_role": "aggregator_knowledge_source"
-                },
-                {
-                    "resource_id": ctgov,
-                    "resource_role": "primary_knowledge_source"
                 }
             ]
+            if pred == treats:
+                edge_sources.append(
+                    {
+                        "resource_id": ctgov,
+                        "resource_role": "supporting_data_source"
+                    }
+                )
+                edge_sources.append(
+                   {
+                        "resource_id": attribute_source,
+                        "resource_role": "primary_knowledge_source",
+                        "source_record_urls": [ kgInfoUrl + line['id'] ]
+                    }
+                )
+            else:
+                edge_sources.append(
+                    {
+                        "resource_id": attribute_source,
+                        "resource_role": "aggregator_knowledge_source",
+                        "source_record_urls": [ kgInfoUrl + line['id'] ]
+                    }
+                )
+                edge_sources.append(
+                   {
+                        "resource_id": ctgov,
+                        "resource_role": "primary_knowledge_source"
+                    }
+                )
 
             association = {
                 "label": pred,
@@ -137,7 +157,7 @@ def load_data(data_folder):
                 "association": association,
                 "object": object_
             }
-            
+
             yield data
 
         else:
@@ -154,7 +174,7 @@ def main():
         #print(json.dumps(entry, sort_keys=True, indent=2))
         #continue
         try: entry = next(gen)
-        except: 
+        except:
             break
         else:
             print(json.dumps(entry, sort_keys=True, indent=2))
