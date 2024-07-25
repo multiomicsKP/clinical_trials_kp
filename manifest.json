@@ -14,13 +14,13 @@
         "uncompress": false,
         "release": "version:get_release"
     },
-    "uploader": [{
-        "name": "for_kp",
+    "uploaders": [{
+        "name": "multiomics_clinical_trials",
         "parser": "file_parser:load_data",
         "on_duplicates": "ignore"
     },
     {
-        "name": "for_annotator",
+        "name": "multiomics_clinical_trials_annotator",
         "parser": "annotator_parser:load_data",
         "on_duplicates": "ignore"
     }
