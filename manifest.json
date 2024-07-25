@@ -14,8 +14,15 @@
         "uncompress": false,
         "release": "version:get_release"
     },
-    "uploader" : {
+    "uploader": [{
+        "name": "for_kp",
         "parser": "file_parser:load_data",
         "on_duplicates": "ignore"
+    },
+    {
+        "name": "for_annotator",
+        "parser": "annotator_parser:load_data",
+        "on_duplicates": "ignore"
     }
+    ]
 }
