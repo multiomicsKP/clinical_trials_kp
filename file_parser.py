@@ -95,7 +95,7 @@ def load_data(data_folder):
             edge_attributes.append(
                 {
                     "attribute_type_id": "biolink:max_research_phase",
-                     "value": str(max_phase),
+                     "value": str(float(max_phase)),
                 }
             )
 
