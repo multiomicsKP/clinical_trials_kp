@@ -98,12 +98,13 @@ def load_data(data_folder):
     final = []
     edges = load_content(data_folder)
     while 1:
-        try: subj, entry = next(edges)
+        try: subj, trials = next(edges)
         except: break
         if subj in output:
-            output[subj].append(entry)
+            for trial in trials:
+                output[subj].append(trial)
         else:
-            output.update({subj: [entry]})
+            output.update({subj: trials})
     for key in output:
         final.append({"_id": key, "clinical_trials": output[key]})
     for entry in final:
