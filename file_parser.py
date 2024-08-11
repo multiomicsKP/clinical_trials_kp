@@ -118,11 +118,11 @@ def load_data(data_folder):
                 )
             
             # boxed warning status
-            if line['subject_boxed_warning'] == 't':
+            if line['subject_boxed_warning'] != '0':
                 edge_attributes.append(
                     {
                         "attribute_type_id": "subject_boxed_warning",
-                        "value": 1==1
+                        "value": line['subject_boxed_warning']
                     }
                 )
             

@@ -109,7 +109,7 @@ def load_data(data_folder):
             output.update({subj: trials})
         warning[subj] = boxed_warning
     for key in output:
-        final.append({"_id": key, "clinical_trials": output[key], "boxed_warning": warning[key] == 't'})
+        final.append({"_id": key, "clinical_trials": output[key], "boxed_warning": warning[key] != "0"})
     for entry in final:
         yield entry
 
