@@ -10,8 +10,8 @@ treats = "biolink:treats"
 phaseNames = {"0.0": "not_provided", "0.5": "pre_clinical_research_phase", "1.0": "clinical_trial_phase_1", "2.0": "clinical_trial_phase_2", "3.0": "clinical_trial_phase_3", "4.0": "clinical_trial_phase_4", "1.5": "clinical_trial_phase_1_to_2", "2.5": "clinical_trial_phase_2_to_3"}
 
 def load_content(data_folder):
-    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.1.tsv")
-    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v2.1.tsv")
+    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.3.0.tsv")
+    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v2.3.0.tsv")
 
     nodes_data = pd.read_csv(nodes_file_path, sep='\t')
     id_name_mapping = {}
@@ -89,7 +89,7 @@ def load_content(data_folder):
                 )
                 
             
-            yield subj, trials
+            yield subj, trials, line['subject_boxed_warning']
 
         else:
             print(f"Cannot find prefix for {line} !")
@@ -97,17 +97,19 @@ def load_content(data_folder):
 def load_data(data_folder):
     output = {}
     final = []
+    warning = {}
     edges = load_content(data_folder)
     while 1:
-        try: subj, trials = next(edges)
+        try: subj, trials, boxed_warning = next(edges)
         except: break
         if subj in output:
             for trial in trials:
                 output[subj].append(trial)
         else:
             output.update({subj: trials})
+        warning[subj] = boxed_warning
     for key in output:
-        final.append({"_id": key, "clinical_trials": output[key]})
+        final.append({"_id": key, "clinical_trials": output[key], "boxed_warning": warning[key] == 't'})
     for entry in final:
         yield entry
 

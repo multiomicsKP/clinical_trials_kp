@@ -7,10 +7,11 @@ aact = "infores:aact"
 ctgov = "infores:clinicaltrials"
 kgInfoUrl = "https://db.systemsbiology.net/gestalt/cgi-pub/KGinfo.pl?id="
 treats = "biolink:treats"
+phaseNames = {"0.0": "not_provided", "0.5": "pre_clinical_research_phase", "1.0": "clinical_trial_phase_1", "2.0": "clinical_trial_phase_2", "3.0": "clinical_trial_phase_3", "4.0": "clinical_trial_phase_4", "1.5": "clinical_trial_phase_1_to_2", "2.5": "clinical_trial_phase_2_to_3"}
 
 def load_data(data_folder):
-    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.1.tsv")
-    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v2.1.tsv")
+    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.3.0.tsv")
+    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v2.3.0.tsv")
 
     nodes_data = pd.read_csv(nodes_file_path, sep='\t')
     id_name_mapping = {}
@@ -33,7 +34,7 @@ def load_data(data_folder):
                 "name": id_name_mapping[subj],
                 "type": id_type_mapping[subj]
             }
-
+            
             prefix = obj.split(':')[0].replace(".","_")
             object_ = {
                 "id": obj,
@@ -58,20 +59,20 @@ def load_data(data_folder):
                 #print(phase,stat,N,Nt)
                 if float(phase) > max_phase:
                     max_phase = float(phase)
-
+                
                 try: N = int(N)
                 except: N = -1
-
+                
                 supporting_studies.append(
                     {
                         "id": nctid,
                         "tested_intervention": "unsure" if pred == "biolink:mentioned_in_trials_for" else "yes",
-                        "phase": phase,
+                        "phase": phaseNames[str(float(phase))],
                         "status": stat,
                         "study_size": N,
                     }
                 )
-
+                
             #if pred == "biolink:in_clinical_trials_for" and max_phase >= 4:
             #        elevate_to_prediction = True
 
@@ -90,59 +91,76 @@ def load_data(data_folder):
                      "value": line['agent_type'],
                 }
             )
-
+            
             # max research phase
             edge_attributes.append(
                 {
                     "attribute_type_id": "biolink:max_research_phase",
-                     "value": str(float(max_phase)),
+                     "value": phaseNames[str(float(max_phase))],
                 }
             )
-
+            
             # elevate to prediction
-            edge_attributes.append(
-                {
-                    "attribute_type_id": "elevate_to_prediction",
-                     "value": str(elevate_to_prediction),
-                }
-            )
-
-            # sources
-            edge_sources = [
-                {
-                    "resource_id": aact,
-                    "resource_role": "aggregator_knowledge_source"
-                }
-            ]
+            #edge_attributes.append(
+            #    {
+            #        "attribute_type_id": "elevate_to_prediction",
+            #         "value": str(elevate_to_prediction),
+            #    }
+            #)
+            
+            # approval status
             if pred == treats:
-                edge_sources.append(
+                edge_attributes.append(
+                    {
+                        "attribute_type_id": "clinical_approval_status",
+                        "value": "biolink:approved_for_condition"
+                    }
+                )
+            
+            # boxed warning status
+            if line['subject_boxed_warning'] == 't':
+                edge_attributes.append(
+                    {
+                        "attribute_type_id": "subject_boxed_warning",
+                        "value": 1==1
+                    }
+                )
+            
+            # sources
+            edge_sources = []
+            if pred == treats:
+                edge_sources = [
                     {
                         "resource_id": ctgov,
                         "resource_role": "supporting_data_source"
-                    }
-                )
-                edge_sources.append(
-                   {
+                    },
+                    {
+                        "resource_id": aact,
+                        "resource_role": "supporting_data_source"
+                    },
+                    {
                         "resource_id": attribute_source,
                         "resource_role": "primary_knowledge_source",
                         "source_record_urls": [ kgInfoUrl + line['id'] ]
                     }
-                )
+                ]
             else:
-                edge_sources.append(
+                edge_sources = [
                     {
                         "resource_id": attribute_source,
                         "resource_role": "aggregator_knowledge_source",
                         "source_record_urls": [ kgInfoUrl + line['id'] ]
-                    }
-                )
-                edge_sources.append(
-                   {
+                    },
+                    {
                         "resource_id": ctgov,
                         "resource_role": "primary_knowledge_source"
+                    },
+                    {
+                       "resource_id": aact,
+                        "resource_role": "aggregator_knowledge_source"
                     }
-                )
-
+                ]
+            
             association = {
                 "label": pred,
                 "attributes": edge_attributes,
@@ -157,7 +175,7 @@ def load_data(data_folder):
                 "association": association,
                 "object": object_
             }
-
+            
             yield data
 
         else:
@@ -174,7 +192,7 @@ def main():
         #print(json.dumps(entry, sort_keys=True, indent=2))
         #continue
         try: entry = next(gen)
-        except:
+        except StopIteration:
             break
         else:
             print(json.dumps(entry, sort_keys=True, indent=2))
