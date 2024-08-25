@@ -10,8 +10,8 @@ treats = "biolink:treats"
 phaseNames = {"0.0": "not_provided", "0.5": "pre_clinical_research_phase", "1.0": "clinical_trial_phase_1", "2.0": "clinical_trial_phase_2", "3.0": "clinical_trial_phase_3", "4.0": "clinical_trial_phase_4", "1.5": "clinical_trial_phase_1_to_2", "2.5": "clinical_trial_phase_2_to_3"}
 
 def load_data(data_folder):
-    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.3.0.tsv")
-    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v2.3.0.tsv")
+    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.3.2.tsv")
+    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v2.3.2.tsv")
 
     nodes_data = pd.read_csv(nodes_file_path, sep='\t')
     id_name_mapping = {}
@@ -73,8 +73,8 @@ def load_data(data_folder):
                     }
                 )
                 
-            #if pred == "biolink:in_clinical_trials_for" and max_phase >= 4:
-            #        elevate_to_prediction = True
+            if pred == "biolink:in_clinical_trials_for" and 1 <= max_phase < 4:
+                    elevate_to_prediction = True
 
             # knowledge level
             edge_attributes.append(
@@ -101,12 +101,12 @@ def load_data(data_folder):
             )
             
             # elevate to prediction
-            #edge_attributes.append(
-            #    {
-            #        "attribute_type_id": "elevate_to_prediction",
-            #         "value": str(elevate_to_prediction),
-            #    }
-            #)
+            edge_attributes.append(
+                {
+                    "attribute_type_id": "elevate_to_prediction",
+                     "value": str(elevate_to_prediction),
+                }
+            )
             
             # approval status
             if pred == treats:
