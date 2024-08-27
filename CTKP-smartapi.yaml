@@ -29,7 +29,7 @@ info:
     pathfinderquery: false
     operations:
       - lookup
-    test_data_location: https://ctkp.rtx.ai:9990/sri_test_triples
+    test_data_location: https://multiomics.rtx.ai:9990/ctkp/sri_test_triples
     externalDocs:
       description: >-
         The values for version are restricted according to the regex in
@@ -37,7 +37,7 @@ info:
       url: https://github.com/NCATSTranslator/translator_extensions/blob/\
         production/x-trapi/
 servers:
-  - url: https://ctkp.rtx.ai:9990
+  - url: https://multiomics.rtx.ai:9990/ctkp
     description: CTKP TRAPI 1.5 endpoint - development
     x-maturity: development
 externalDocs:
