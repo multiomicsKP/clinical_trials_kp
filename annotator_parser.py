@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import json
 
-attribute_source = "infores:multiomics-clinicaltrials"
+attribute_source = "infores:clinicaltrials"
 aact = "infores:aact"
 ctgov = "infores:clinicaltrials"
 kgInfoUrl = "https://db.systemsbiology.net/gestalt/cgi-pub/KGinfo.pl?id="
