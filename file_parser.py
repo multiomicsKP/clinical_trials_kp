@@ -10,8 +10,8 @@ treats = "biolink:treats"
 phaseNames = {"0.0": "not_provided", "0.5": "pre_clinical_research_phase", "1.0": "clinical_trial_phase_1", "2.0": "clinical_trial_phase_2", "3.0": "clinical_trial_phase_3", "4.0": "clinical_trial_phase_4", "1.5": "clinical_trial_phase_1_to_2", "2.5": "clinical_trial_phase_2_to_3"}
 
 def load_data(data_folder):
-    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.3.6.tsv")
-    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v2.3.6.tsv")
+    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.4.0.tsv")
+    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v2.4.0.tsv")
 
     nodes_data = pd.read_csv(nodes_file_path, sep='\t')
     id_name_mapping = {}
@@ -118,11 +118,11 @@ def load_data(data_folder):
                 )
             
             # boxed warning status
-            if line['subject_boxed_warning'] != '0':
+            if line['intervention_boxed_warning'] != '0':
                 edge_attributes.append(
                     {
-                        "attribute_type_id": "subject_boxed_warning",
-                        "value": line['subject_boxed_warning']
+                        "attribute_type_id": "intervention_boxed_warning",
+                        "value": line['intervention_boxed_warning']
                     }
                 )
             
@@ -148,16 +148,16 @@ def load_data(data_folder):
                 edge_sources = [
                     {
                         "resource_id": attribute_source,
-                        "resource_role": "aggregator_knowledge_source",
+                        "resource_role": "primary_knowledge_source",
                         "source_record_urls": [ kgInfoUrl + line['id'] ]
                     },
                     {
                         "resource_id": ctgov,
-                        "resource_role": "primary_knowledge_source"
+                        "resource_role": "supporting_data_source"
                     },
                     {
                        "resource_id": aact,
-                        "resource_role": "aggregator_knowledge_source"
+                        "resource_role": "supporting_data_source"
                     }
                 ]
             
