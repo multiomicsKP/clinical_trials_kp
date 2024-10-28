@@ -43,6 +43,9 @@ servers:
   - url: https://multiomics.ci.transltr.io/ctkp
     description: CTKP TRAPI 1.5 endpoint - staging
     x-maturity: staging
+  - url: https://multiomics.test.transltr.io/ctkp
+    description: CTKP TRAPI 1.5 endpoint - testing
+    x-maturity: testing
 externalDocs:
   description: >-
     Documentation for the NCATS Biomedical Translator Reasoners web services
