@@ -10,8 +10,8 @@ treats = "biolink:treats"
 phaseNames = {"0.0": "not_provided", "0.5": "pre_clinical_research_phase", "1.0": "clinical_trial_phase_1", "2.0": "clinical_trial_phase_2", "3.0": "clinical_trial_phase_3", "4.0": "clinical_trial_phase_4", "1.5": "clinical_trial_phase_1_to_2", "2.5": "clinical_trial_phase_2_to_3"}
 
 def load_content(data_folder):
-    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.5.4.tsv")
-    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v2.5.4.tsv")
+    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v2.6.0.tsv")
+    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v2.6.0.tsv")
 
     nodes_data = pd.read_csv(nodes_file_path, sep='\t')
     id_name_mapping = {}
@@ -63,12 +63,12 @@ def load_content(data_folder):
                 }
             ]
             
-            nctids = str(line['nctid']).split(',')
-            phases = str(line['phase']).split(',')
-            status = str(line['overall_status']).split(',')
-            enroll = str(line['enrollment']).split(',')
-            en_typ = str(line['enrollment_type']).split(',')
-            tested = str(line['tested']).split(',')
+            nctids = str(line['nctid']).split('|')
+            phases = str(line['phase']).split('|')
+            status = str(line['overall_status']).split('|')
+            enroll = str(line['enrollment']).split('|')
+            en_typ = str(line['enrollment_type']).split('|')
+            tested = str(line['tested']).split('|')
             trials = []
 
             for nctid,phase,stat,N,Nt,test in zip(nctids,phases,status,enroll,en_typ,tested):
