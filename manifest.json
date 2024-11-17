@@ -1,5 +1,5 @@
 {
-    "version": "2.6.0",
+    "version": "2.6.1",
     "__metadata__": {
         "url": "https://aact.ctti-clinicaltrials.org/",
         "license_url": "https://github.com/ctti-clinicaltrials/aact/blob/dev/LICENSE",
@@ -8,8 +8,8 @@
     },
     "dumper": {
         "data_url": [
-            "https://db.systemsbiology.net/gestalt/KG/clinical_trials_kg_edges_v2.6.0.tsv",
-            "https://db.systemsbiology.net/gestalt/KG/clinical_trials_kg_nodes_v2.6.0.tsv"
+            "https://db.systemsbiology.net/gestalt/KG/clinical_trials_kg_edges_v2.6.1.tsv",
+            "https://db.systemsbiology.net/gestalt/KG/clinical_trials_kg_nodes_v2.6.1.tsv"
         ],
         "uncompress": false,
         "release": "version:get_release"
