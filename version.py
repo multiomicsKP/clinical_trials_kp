@@ -1,2 +1,2 @@
 def get_release(self):
-    return "2.6.14"
+    return "2.6.15"
