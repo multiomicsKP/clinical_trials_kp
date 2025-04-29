@@ -1,6 +1,6 @@
 # Clinical Trials KP
 
-**Description**: The Clinical Trials KP, created and maintained by the [Multiomics Provider](https://github.com/NCATSTranslator/Translator-All/wiki/Multiomics-Provider), provides information on Clinical Trials, ultimately derived from researcher submissions to clinicaltrials.gov, via the Aggregate Analysis of Clinical Trials (AACT) database). Information on select trials includes the NCT Identifier of the trial, interventions used, diseases/conditions relevant to the trial, adverse events, etc.
+**Description**: The Clinical Trials KP, created by the [Multiomics Provider](https://github.com/NCATSTranslator/Translator-All/wiki/Multiomics-Provider), provides information on Clinical Trials, ultimately derived from researcher submissions to clinicaltrials.gov, via the Aggregate Analysis of Clinical Trials (AACT) database). Information on select trials includes the NCT Identifier of the trial, interventions used, diseases/conditions relevant to the trial, adverse events, etc.
 
 **Example**: The Multiomics Clinical Trials KG reports that warfarin was used as an intervention for end-stage renal failure in a (completed) phase 3 clinical trial with 170 participants (NCT Identifier NCT00157651), and in a (currently recruiting) phase 4 clinical trial anticipating recruitment of 718 participants (NCT03862859).
 
