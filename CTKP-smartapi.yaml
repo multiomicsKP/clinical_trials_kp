@@ -390,7 +390,6 @@ components:
             /async_query_status to receive an update on the status of
             the job.
           type: string
-          example: rXEOAosN3L
           nullable: false
       additionalProperties: true
       required:
