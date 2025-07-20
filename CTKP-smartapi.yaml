@@ -223,7 +223,6 @@ paths:
         - in: path
           name: job_id
           description: Identifier of the job for status request
-          example: rXEOAosN3L
           required: true
           schema:
             type: string
