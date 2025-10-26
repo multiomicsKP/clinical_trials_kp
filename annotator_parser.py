@@ -10,8 +10,8 @@ treats = "biolink:treats"
 phaseNames = {"0.0": "not_provided", "0.5": "pre_clinical_research_phase", "1.0": "clinical_trial_phase_1", "2.0": "clinical_trial_phase_2", "3.0": "clinical_trial_phase_3", "4.0": "clinical_trial_phase_4", "1.5": "clinical_trial_phase_1_to_2", "2.5": "clinical_trial_phase_2_to_3"}
 
 def load_content(data_folder):
-    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v3.1.15.tsv.gz")
-    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v3.1.15.tsv.gz")
+    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v3.1.16.tsv.gz")
+    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v3.1.16.tsv.gz")
 
     nodes_data = pd.read_csv(nodes_file_path, sep='\t')
     id_name_mapping = {}
