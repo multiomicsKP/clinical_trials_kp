@@ -22,12 +22,10 @@ def load_content(data_folder):
         id_type_mapping[row["id"]] = row["category"]
     edges_data = pd.read_csv(edges_file_path, sep='\t', quoting=csv.QUOTE_NONE)
     for index,line in edges_data.iterrows():
-        print(line)
         subj = line['subject']
         pred = line['predicate']
         if pred == treats: continue
         obj = line['object']
-        print(subj, pred, obj, sep='\t', flush=True)
         if subj and pred and subj.split(':')[0] and obj.split(':')[0]:
             source_record_url = kgInfoUrl + line['id']
             prefix = obj.split(':')[0].replace(".","_")
