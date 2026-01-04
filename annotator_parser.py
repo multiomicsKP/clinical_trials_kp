@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import json
+import csv
 
 attribute_source = "infores:clinicaltrials"
 aact = "infores:aact"
@@ -10,8 +11,8 @@ treats = "biolink:treats"
 phaseNames = {"0.0": "not_provided", "0.5": "pre_clinical_research_phase", "1.0": "clinical_trial_phase_1", "2.0": "clinical_trial_phase_2", "3.0": "clinical_trial_phase_3", "4.0": "clinical_trial_phase_4", "1.5": "clinical_trial_phase_1_to_2", "2.5": "clinical_trial_phase_2_to_3"}
 
 def load_content(data_folder):
-    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v3.1.24.tsv.gz")
-    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v3.1.24.tsv.gz")
+    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v3.1.26.tsv.gz")
+    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v3.1.26.tsv.gz")
 
     nodes_data = pd.read_csv(nodes_file_path, sep='\t')
     id_name_mapping = {}
@@ -19,13 +20,14 @@ def load_content(data_folder):
     for index,row in nodes_data.iterrows():
         id_name_mapping[row["id"]] = row["name"]
         id_type_mapping[row["id"]] = row["category"]
-
-    edges_data = pd.read_csv(edges_file_path, sep='\t')
+    edges_data = pd.read_csv(edges_file_path, sep='\t', quoting=csv.QUOTE_NONE)
     for index,line in edges_data.iterrows():
+        print(line)
         subj = line['subject']
         pred = line['predicate']
         if pred == treats: continue
-        obj  = line['object']
+        obj = line['object']
+        print(subj, pred, obj, sep='\t', flush=True)
         if subj and pred and subj.split(':')[0] and obj.split(':')[0]:
             source_record_url = kgInfoUrl + line['id']
             prefix = obj.split(':')[0].replace(".","_")
