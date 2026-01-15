@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import json
+import csv
 
 attribute_source = "infores:multiomics-clinicaltrials"
 aact = "infores:aact"
@@ -20,7 +21,7 @@ def load_data(data_folder):
         id_name_mapping[row["id"]] = row["name"]
         id_type_mapping[row["id"]] = row["category"]
 
-    edges_data = pd.read_csv(edges_file_path, sep='\t')
+    edges_data = pd.read_csv(edges_file_path, sep='\t', quoting=csv.QUOTE_NONE)
     for index,line in edges_data.iterrows():
         subj = line['subject']
         pred = line['predicate']
