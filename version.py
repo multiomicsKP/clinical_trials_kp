@@ -1,2 +1,2 @@
 def get_release(self):
-    return "3.1.30"
+    return "3.1.31"
