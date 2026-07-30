@@ -69,9 +69,10 @@ def load_content(data_folder):
             enroll = str(line['enrollment']).split('|')
             en_typ = str(line['enrollment_type']).split('|')
             tested = str(line['tested']).split('|')
+            sdates = str(line['start_date']).split('|')
             trials = []
 
-            for nctid,phase,stat,N,Nt,test in zip(nctids,phases,status,enroll,en_typ,tested):
+            for nctid,phase,stat,N,Nt,test,sdate in zip(nctids,phases,status,enroll,en_typ,tested,sdates):
                 try: N = int(N)
                 except: N = -1
                 trials.append(
@@ -81,6 +82,7 @@ def load_content(data_folder):
                         "tested_intervention": test,
                         "phase": phaseNames[str(float(phase))],
                         "status": stat,
+                        "start_date": sdate,
                         "study_size": N,
                         "source_record_urls": [ source_record_url ],
                         "disease": disease
