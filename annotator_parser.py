@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import json
 import csv
+import sys
 
 attribute_source = "infores:clinicaltrials"
 aact = "infores:aact"
@@ -10,9 +11,14 @@ kgInfoUrl = "https://db.systemsbiology.net/gestalt/cgi-pub/KGinfo.pl?id="
 treats = "biolink:treats"
 phaseNames = {"0.0": "not_provided", "0.5": "pre_clinical_research_phase", "1.0": "clinical_trial_phase_1", "2.0": "clinical_trial_phase_2", "3.0": "clinical_trial_phase_3", "4.0": "clinical_trial_phase_4", "1.5": "clinical_trial_phase_1_to_2", "2.5": "clinical_trial_phase_2_to_3", "nan": "not_provided"}
 
+def phaseName(phase):
+    # phase may be blank within a pipe-delimited list, or the literal 'nan'
+    try: return phaseNames[str(float(phase))]
+    except (ValueError, KeyError): return "not_provided"
+
 def load_content(data_folder):
-    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v4.1.1.tsv.gz")
-    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v4.1.1.tsv.gz")
+    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v4.1.3.tsv.gz")
+    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v4.1.3.tsv.gz")
 
     nodes_data = pd.read_csv(nodes_file_path, sep='\t')
     id_name_mapping = {}
@@ -72,15 +78,15 @@ def load_content(data_folder):
             sdates = str(line['start_date']).split('|')
             trials = []
 
-            for nctid,phase,stat,N,Nt,test,sdate in zip(nctids,phases,status,enroll,en_typ,tested,sdates):
+            for nctid,phase,stat,N,Nt,test,sdate in zip(nctids,phases,status,enroll,en_typ,tested,sdates,strict=True):
                 try: N = int(N)
-                except: N = -1
+                except (ValueError, TypeError): N = -1
                 trials.append(
                     {
                         "id": nctid,
                         "label": pred,
                         "tested_intervention": test,
-                        "phase": phaseNames[str(float(phase))],
+                        "phase": phaseName(phase),
                         "status": stat,
                         "start_date": sdate,
                         "study_size": N,
@@ -90,40 +96,34 @@ def load_content(data_folder):
                 )
                 
             
-            yield subj, trials, line['intervention_boxed_warning']
+            # NaN when no intervention on this edge carries a boxed warning,
+            # otherwise "N/M" with N >= 1
+            yield subj, trials, bool(pd.notna(line['intervention_boxed_warning']))
 
         else:
-            print(f"Cannot find prefix for {line} !")
+            print(f"Cannot find prefix for {line} !", file=sys.stderr)
 
 def load_data(data_folder):
     output = {}
     final = []
     warning = {}
-    edges = load_content(data_folder)
-    while 1:
-        try: subj, trials, boxed_warning = next(edges)
-        except: break
+    for subj, trials, boxed_warning in load_content(data_folder):
         if subj in output:
             for trial in trials:
                 output[subj].append(trial)
         else:
             output.update({subj: trials})
-        warning[subj] = boxed_warning
+        # a boxed warning on any edge for this subject marks the subject
+        warning[subj] = warning.get(subj, False) or boxed_warning
     for key in output:
-        final.append({"_id": key, "clinical_trials": output[key], "boxed_warning": warning[key] != "0"})
+        final.append({"_id": key, "clinical_trials": output[key], "boxed_warning": warning[key]})
     for entry in final:
         yield entry
 
 
 
 def main():
-    gen = load_data('test')
-    while 1:
-        try:
-            entry = next(gen)
-        except: 
-            break
-        #entry = next(gen)
+    for entry in load_data('test'):
         print(json.dumps(entry, sort_keys=True, indent=2))
 
 
