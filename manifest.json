@@ -8,8 +8,8 @@
     },
     "dumper": {
         "data_url": [
-            "https://db.systemsbiology.net/gestalt/KG/clinical_trials_kg_edges_v4.1.3.tsv",
-            "https://db.systemsbiology.net/gestalt/KG/clinical_trials_kg_nodes_v4.1.3.tsv"
+            "https://db.systemsbiology.net/gestalt/KG/clinical_trials_kg_edges_current.tsv",
+            "https://db.systemsbiology.net/gestalt/KG/clinical_trials_kg_nodes_current.tsv"
         ],
         "uncompress": false,
         "release": "version:get_release"
