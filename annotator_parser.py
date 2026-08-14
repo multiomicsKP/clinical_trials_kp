@@ -56,16 +56,16 @@ def load_content(data_folder):
             edge_sources = [
                 {
                     "resource_id": attribute_source,
-                    "resource_role": "aggregator_knowledge_source",
+                    "resource_role": "primary_knowledge_source",
                     "source_record_urls": [ source_record_url ]
                 },
                 {
                     "resource_id": ctgov,
-                    "resource_role": "primary_knowledge_source"
+                    "resource_role": "supporting_data_source"
                 },
                 {
                    "resource_id": aact,
-                    "resource_role": "aggregator_knowledge_source"
+                    "resource_role": "supporting_data_source"
                 }
             ]
             
