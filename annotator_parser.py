@@ -1,107 +1,81 @@
-import pandas as pd
+import gzip
 import os
 import json
-import csv
 import sys
 
-attribute_source = "infores:clinicaltrials"
-aact = "infores:aact"
-ctgov = "infores:clinicaltrials"
 kgInfoUrl = "https://db.systemsbiology.net/gestalt/cgi-pub/KGinfo.pl?id="
 treats = "biolink:treats"
-phaseNames = {"0.0": "not_provided", "0.5": "pre_clinical_research_phase", "1.0": "clinical_trial_phase_1", "2.0": "clinical_trial_phase_2", "3.0": "clinical_trial_phase_3", "4.0": "clinical_trial_phase_4", "1.5": "clinical_trial_phase_1_to_2", "2.5": "clinical_trial_phase_2_to_3", "nan": "not_provided"}
+studyPrefix = "CLINICALTRIALS:"
 
-def phaseName(phase):
-    # phase may be blank within a pipe-delimited list, or the literal 'nan'
-    try: return phaseNames[str(float(phase))]
-    except (ValueError, KeyError): return "not_provided"
+def open_jsonl(data_folder, which):
+    # the dumper may or may not keep the files compressed
+    path = os.path.join(data_folder, f"clinical_trials_kg_{which}_current.jsonl")
+    if os.path.exists(path + ".gz"): return gzip.open(path + ".gz", 'rt')
+    return open(path)
+
+def load_nodes(data_folder):
+    # only the fields the annotator needs, to keep this out of swap
+    id_name_mapping = {}
+    studies = {}
+    with open_jsonl(data_folder, "nodes") as nodes_file:
+        for nodeline in nodes_file:
+            node = json.loads(nodeline)
+            id = node["id"]
+            if id.startswith(studyPrefix):
+                studies[id] = {
+                    "tested_intervention": node["clinical_trial_tested_intervention"],
+                    "phase": node.get("clinical_trial_phase", "not_provided"),
+                    "status": node["clinical_trial_overall_status"],
+                    "start_date": node.get("clinical_trial_start_date", ""),
+                    "study_size": node.get("clinical_trial_enrollment", -1),
+                }
+            else:
+                id_name_mapping[id] = node["name"]
+    return id_name_mapping, studies
 
 def load_content(data_folder):
-    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_current.tsv.gz")
-    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_current.tsv.gz")
+    id_name_mapping, studies = load_nodes(data_folder)
 
-    nodes_data = pd.read_csv(nodes_file_path, sep='\t')
-    id_name_mapping = {}
-    id_type_mapping = {}
-    for index,row in nodes_data.iterrows():
-        id_name_mapping[row["id"]] = row["name"]
-        id_type_mapping[row["id"]] = row["category"]
-    edges_data = pd.read_csv(edges_file_path, sep='\t', quoting=csv.QUOTE_NONE)
-    for index,line in edges_data.iterrows():
-        subj = line['subject']
-        pred = line['predicate']
-        if pred == treats: continue
-        obj = line['object']
-        if subj and pred and subj.split(':')[0] and obj.split(':')[0]:
-            source_record_url = kgInfoUrl + line['id']
-            prefix = obj.split(':')[0].replace(".","_")
-            disease = {
-                prefix.lower(): obj,
-                "name": id_name_mapping[obj],
-            }
-            
-            # properties for predicate/association
-            edge_attributes = [
-                {
-                    "attribute_type_id": "biolink:knowledge_level",
-                    "value": line['knowledge_level'],
-                },
-                {
-                    "attribute_type_id": "biolink:agent_type",
-                     "value": line['agent_type'],
+    with open_jsonl(data_folder, "edges") as edges_file:
+        for edgeline in edges_file:
+            line = json.loads(edgeline)
+            subj = line['subject']
+            pred = line['predicate']
+            if pred == treats: continue
+            obj = line['object']
+            if subj and pred and subj.split(':')[0] and obj.split(':')[0]:
+                source_record_url = kgInfoUrl + line['id']
+                prefix = obj.split(':')[0].replace(".","_")
+                disease = {
+                    prefix.lower(): obj,
+                    "name": id_name_mapping[obj],
                 }
-            ]
-            
-            # sources
-            edge_sources = [
-                {
-                    "resource_id": attribute_source,
-                    "resource_role": "primary_knowledge_source",
-                    "source_record_urls": [ source_record_url ]
-                },
-                {
-                    "resource_id": ctgov,
-                    "resource_role": "supporting_data_source"
-                },
-                {
-                   "resource_id": aact,
-                    "resource_role": "supporting_data_source"
-                }
-            ]
-            
-            nctids = str(line['nctid']).split('|')
-            phases = str(line['phase']).split('|')
-            status = str(line['overall_status']).split('|')
-            enroll = str(line['enrollment']).split('|')
-            en_typ = str(line['enrollment_type']).split('|')
-            tested = str(line['tested']).split('|')
-            sdates = str(line['start_date']).split('|')
-            trials = []
 
-            for nctid,phase,stat,N,Nt,test,sdate in zip(nctids,phases,status,enroll,en_typ,tested,sdates,strict=True):
-                try: N = int(N)
-                except (ValueError, TypeError): N = -1
-                trials.append(
-                    {
-                        "id": nctid,
-                        "label": pred,
-                        "tested_intervention": test,
-                        "phase": phaseName(phase),
-                        "status": stat,
-                        "start_date": sdate,
-                        "study_size": N,
-                        "source_record_urls": [ source_record_url ],
-                        "disease": disease
-                    }
-                )
-                
-            
-            # NaN when no intervention on this edge carries a boxed warning,
-            # otherwise "N/M" with N >= 1
-            yield subj, trials, bool(pd.notna(line['intervention_boxed_warning']))
+                # the per-trial details live on the study nodes
+                trials = []
+                for study_id in line['has_supporting_studies']:
+                    study = studies[study_id]
+                    trials.append(
+                        {
+                            "id": study_id[len(studyPrefix):],
+                            "label": pred,
+                            "tested_intervention": study["tested_intervention"],
+                            "phase": study["phase"],
+                            "status": study["status"],
+                            "start_date": study["start_date"],
+                            "study_size": study["study_size"],
+                            "source_record_urls": [ source_record_url ],
+                            "disease": disease
+                        }
+                    )
 
-        else:
-            print(f"Cannot find prefix for {line} !", file=sys.stderr)
+                # NaN when no intervention on this edge carries a boxed warning,
+                # otherwise "N/M" with N >= 1
+                boxed_warning = line['intervention_boxed_warning']
+                yield subj, trials, isinstance(boxed_warning, str) and boxed_warning != ""
+
+            else:
+                print(f"Cannot find prefix for {line} !", file=sys.stderr)
 
 def load_data(data_folder):
     output = {}
@@ -123,7 +97,8 @@ def load_data(data_folder):
 
 
 def main():
-    for entry in load_data('test'):
+    data_folder = sys.argv[1] if len(sys.argv) > 1 else 'test'
+    for entry in load_data(data_folder):
         print(json.dumps(entry, sort_keys=True, indent=2))
 
 
