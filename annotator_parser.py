@@ -17,8 +17,8 @@ def phaseName(phase):
     except (ValueError, KeyError): return "not_provided"
 
 def load_content(data_folder):
-    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_v4.1.3.tsv.gz")
-    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_v4.1.3.tsv.gz")
+    edges_file_path = os.path.join(data_folder, "clinical_trials_kg_edges_current.tsv.gz")
+    nodes_file_path = os.path.join(data_folder, "clinical_trials_kg_nodes_current.tsv.gz")
 
     nodes_data = pd.read_csv(nodes_file_path, sep='\t')
     id_name_mapping = {}
