@@ -15,7 +15,7 @@ info:
     team:
       - Multiomics Provider
     biolink-version: 4.2.2
-    infores: infores:multiomics-clinicaltrials
+    infores: infores:clinicaltrials-kp
     externalDocs:
       description: >-
         The values for component and team are restricted according to this
