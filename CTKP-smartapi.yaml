@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   description: TRAPI 1.5 endpoint for the Multiomics Clinical Trials KP, an NCATS Biomedical Translator Knowledge Provider
-  version: 4.2.1
+  version: 4.2.2
   title: Clinical Trials KP - TRAPI 1.5.0
   contact:
     email: gglusman@systemsbiology.org
@@ -14,7 +14,7 @@ info:
     component: KP
     team:
       - Multiomics Provider
-    biolink-version: 4.2.1
+    biolink-version: 4.2.2
     infores: infores:multiomics-clinicaltrials
     externalDocs:
       description: >-
