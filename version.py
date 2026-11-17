@@ -1,2 +1,7 @@
+import os
+
+
 def get_release(self):
-    return "4.2.7"
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "version.txt")
+    with open(path) as f:
+        return f.read().strip()
